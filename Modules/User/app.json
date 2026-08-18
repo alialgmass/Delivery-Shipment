@@ -1,0 +1,12 @@
+{
+    "name": "user",
+    "namespace": "Modules\\User\\",
+    "author": "Royal <hello@example.com>",
+    "description": "",
+    "providers": [
+        "Modules\\User\\Providers\\UserServiceProvider",
+        "Modules\\User\\Providers\\EventServiceProvider",
+        "Modules\\User\\Providers\\RouteServiceProvider"
+    ],
+    "status": "enabled"
+}

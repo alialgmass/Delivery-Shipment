@@ -1,0 +1,12 @@
+{
+    "name": "shipment",
+    "namespace": "Modules\\Shipment\\",
+    "author": "Royal <hello@example.com>",
+    "description": "",
+    "providers": [
+        "Modules\\Shipment\\Providers\\ShipmentServiceProvider",
+        "Modules\\Shipment\\Providers\\EventServiceProvider",
+        "Modules\\Shipment\\Providers\\RouteServiceProvider"
+    ],
+    "status": "enabled"
+}

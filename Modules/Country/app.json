@@ -1,0 +1,12 @@
+{
+    "name": "country",
+    "namespace": "Modules\\Country\\",
+    "author": "eali7 <hello@example.com>",
+    "description": "",
+    "providers": [
+        "Modules\\Country\\Providers\\CountryServiceProvider",
+        "Modules\\Country\\Providers\\EventServiceProvider",
+        "Modules\\Country\\Providers\\RouteServiceProvider"
+    ],
+    "status": "enabled"
+}
