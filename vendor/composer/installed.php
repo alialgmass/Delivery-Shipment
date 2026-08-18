@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/vue-starter-kit',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '0fc5d58340fb1107ffb016b44702cb7fbb109254',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -844,6 +844,15 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+        'laravel/boost' => array(
+            'pretty_version' => 'v2.5.4',
+            'version' => '2.5.4.0',
+            'reference' => '778f4c9bfc5c8a92af660a85cd843be8189ffe34',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/boost',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'laravel/chisel' => array(
             'pretty_version' => 'v0.1.1',
             'version' => '0.1.1.0',
@@ -870,6 +879,15 @@
             'install_path' => __DIR__ . '/../laravel/framework',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'laravel/mcp' => array(
+            'pretty_version' => 'v0.9.4',
+            'version' => '0.9.4.0',
+            'reference' => '7ca5b923630118696602d14348cd0466a5e853ec',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/mcp',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'laravel/pail' => array(
             'pretty_version' => 'v1.2.7',
@@ -925,6 +943,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'laravel/roster' => array(
+            'pretty_version' => 'v1.0.0',
+            'version' => '1.0.0.0',
+            'reference' => '89e518bd88ae98ff50f6082f6b517c8d8e8245fa',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/roster',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'laravel/sail' => array(
             'pretty_version' => 'v1.67.0',
             'version' => '1.67.0.0',
@@ -962,9 +989,9 @@
             'dev_requirement' => false,
         ),
         'laravel/vue-starter-kit' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '0fc5d58340fb1107ffb016b44702cb7fbb109254',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
