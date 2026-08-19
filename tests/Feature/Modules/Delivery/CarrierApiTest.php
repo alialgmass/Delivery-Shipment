@@ -23,7 +23,7 @@ class CarrierApiTest extends TestCase
     {
         $this->actingUser();
 
-        $response = $this->postJson('/api/v1/delivery/carriers', [
+        $response = $this->postJson('/api/delivery/v1/carriers', [
             'name' => 'Fast Express',
             'phone' => '01012345678',
             'vehicle_number' => 'AB-1234',
@@ -41,7 +41,7 @@ class CarrierApiTest extends TestCase
     {
         $this->actingUser();
 
-        $this->postJson('/api/v1/delivery/carriers', ['name' => ''])
+        $this->postJson('/api/delivery/v1/carriers', ['name' => ''])
             ->assertStatus(400)
             ->assertJsonPath('status', false)
             ->assertJsonPath('custom_code', 4000);
@@ -53,7 +53,7 @@ class CarrierApiTest extends TestCase
         Carrier::factory()->create(['name' => 'Alpha Express']);
         Carrier::factory()->create(['name' => 'Beta Cargo']);
 
-        $this->getJson('/api/v1/delivery/carriers?search=Alpha')
+        $this->getJson('/api/delivery/v1/carriers?search=Alpha')
             ->assertOk()
             ->assertJsonCount(1, 'body.carriers.data')
             ->assertJsonPath('body.carriers.data.0.name', 'Alpha Express');
@@ -61,11 +61,11 @@ class CarrierApiTest extends TestCase
 
     public function test_listing_carriers_requires_authentication(): void
     {
-        $this->getJson('/api/v1/delivery/carriers')->assertStatus(401);
+        $this->getJson('/api/delivery/v1/carriers')->assertStatus(401);
     }
 
     public function test_creating_carriers_requires_authentication(): void
     {
-        $this->postJson('/api/v1/delivery/carriers', ['name' => 'Fast Express'])->assertStatus(401);
+        $this->postJson('/api/delivery/v1/carriers', ['name' => 'Fast Express'])->assertStatus(401);
     }
 }

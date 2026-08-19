@@ -11,12 +11,19 @@ Route::get('/user', function (Request $request) {
 });
 
 foreach (module_name_lists() as $module) {
-    $path = base_path("Modules/{$module}/routes/api.php");
+    $moduleName = Str::of($module)->snake('-')->lower()->toString();
+    $versionDir = base_path("Modules/{$module}/routes/api");
 
-    if (file_exists($path)) {
+    if (! is_dir($versionDir)) {
+        continue;
+    }
+
+    foreach (glob($versionDir.'/*.php') as $path) {
+        $version = basename($path, '.php');
+
         Route::middleware([AcceptJsonMiddleware::class, AppLanguage::class])
-            ->prefix(Str::of($module)->snake('-')->lower()->toString())
-            ->as(Str::of($module)->snake('-')->lower()->append('.')->toString())
+            ->prefix("{$moduleName}/{$version}")
+            ->as("{$moduleName}.")
             ->group(function () use ($path) {
                 require $path;
             });

@@ -37,7 +37,7 @@ class ShipmentApiTest extends TestCase
     {
         $user = $this->actingUser();
 
-        $response = $this->postJson('/api/v1/shipment/shipments', $this->shipmentPayload());
+        $response = $this->postJson('/api/shipment/v1/shipments', $this->shipmentPayload());
 
         $response->assertOk()
             ->assertJsonPath('status', true)
@@ -65,7 +65,7 @@ class ShipmentApiTest extends TestCase
     {
         $this->actingUser();
 
-        $this->postJson('/api/v1/shipment/shipments', [])
+        $this->postJson('/api/shipment/v1/shipments', [])
             ->assertStatus(400)
             ->assertJsonPath('status', false)
             ->assertJsonPath('custom_code', 4000);
@@ -77,7 +77,7 @@ class ShipmentApiTest extends TestCase
         Shipment::factory()->count(2)->create(['customer_id' => $user->id]);
         Shipment::factory()->create(['customer_id' => User::factory()->create()->id]);
 
-        $this->getJson('/api/v1/shipment/shipments')
+        $this->getJson('/api/shipment/v1/shipments')
             ->assertOk()
             ->assertJsonCount(2, 'body.shipments.data');
     }
@@ -94,7 +94,7 @@ class ShipmentApiTest extends TestCase
             'tracking_code' => 'DS-XYZ99999',
         ]);
 
-        $this->getJson('/api/v1/shipment/shipments?status=delivered&search=XYZ')
+        $this->getJson('/api/shipment/v1/shipments?status=delivered&search=XYZ')
             ->assertOk()
             ->assertJsonCount(1, 'body.shipments.data')
             ->assertJsonPath('body.shipments.data.0.tracking_code', 'DS-XYZ99999')
@@ -106,7 +106,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->getJson("/api/v1/shipment/shipments/{$shipment->id}")
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}")
             ->assertOk()
             ->assertJsonPath('body.shipment.id', $shipment->id)
             ->assertJsonPath('body.shipment.tracking_code', $shipment->tracking_code)
@@ -118,7 +118,7 @@ class ShipmentApiTest extends TestCase
         $this->actingUser();
         $shipment = Shipment::factory()->create();
 
-        $this->getJson("/api/v1/shipment/shipments/{$shipment->id}")
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}")
             ->assertStatus(403)
             ->assertJsonPath('status', false)
             ->assertJsonPath('custom_code', 4003);
@@ -128,7 +128,7 @@ class ShipmentApiTest extends TestCase
     {
         $this->actingUser();
 
-        $this->getJson('/api/v1/shipment/shipments/9999')
+        $this->getJson('/api/shipment/v1/shipments/9999')
             ->assertStatus(404)
             ->assertJsonPath('custom_code', 4002);
     }
@@ -138,14 +138,14 @@ class ShipmentApiTest extends TestCase
         $user = User::factory()->create();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->getJson("/api/v1/shipment/track/{$shipment->tracking_code}")
+        $this->getJson("/api/shipment/v1/track/{$shipment->tracking_code}")
             ->assertOk()
             ->assertJsonPath('body.shipment.tracking_code', $shipment->tracking_code);
     }
 
     public function test_tracking_with_unknown_code_returns_404(): void
     {
-        $this->getJson('/api/v1/shipment/track/DS-NOTFOUND')
+        $this->getJson('/api/shipment/v1/track/DS-NOTFOUND')
             ->assertStatus(404)
             ->assertJsonPath('custom_code', 4002);
     }
@@ -155,7 +155,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/status", [
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", [
             'status' => 'picked_up',
             'note' => 'Picked up from warehouse',
             'location' => 'Cairo',
@@ -180,7 +180,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/status", ['status' => 'delivered'])
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'delivered'])
             ->assertStatus(400)
             ->assertJsonPath('status', false)
             ->assertJsonPath('custom_code', 4005);
@@ -196,7 +196,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/status", ['status' => 'pending'])
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'pending'])
             ->assertStatus(400)
             ->assertJsonPath('custom_code', 4004);
     }
@@ -206,7 +206,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->outForDelivery()->create(['customer_id' => $user->id]);
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/status", ['status' => 'delivered'])
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'delivered'])
             ->assertOk()
             ->assertJsonPath('body.shipment.status', 'delivered');
 
@@ -218,7 +218,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
 
-        $this->postJson("/api/v1/shipment/shipments/{$shipment->id}/cancel", ['note' => 'Customer changed mind'])
+        $this->postJson("/api/shipment/v1/shipments/{$shipment->id}/cancel", ['note' => 'Customer changed mind'])
             ->assertOk()
             ->assertJsonPath('body.shipment.status', 'cancelled');
 
@@ -235,7 +235,7 @@ class ShipmentApiTest extends TestCase
         $user = $this->actingUser();
         $shipment = Shipment::factory()->delivered()->create(['customer_id' => $user->id]);
 
-        $this->postJson("/api/v1/shipment/shipments/{$shipment->id}/cancel")
+        $this->postJson("/api/shipment/v1/shipments/{$shipment->id}/cancel")
             ->assertStatus(400)
             ->assertJsonPath('custom_code', 4005);
     }
@@ -246,7 +246,7 @@ class ShipmentApiTest extends TestCase
         $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
         $carrier = Carrier::factory()->create();
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/carrier", ['carrier_id' => $carrier->id])
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/carrier", ['carrier_id' => $carrier->id])
             ->assertOk()
             ->assertJsonPath('body.shipment.carrier.id', $carrier->id);
 
@@ -261,15 +261,15 @@ class ShipmentApiTest extends TestCase
         $this->actingUser();
         $shipment = Shipment::factory()->create();
 
-        $this->patchJson("/api/v1/shipment/shipments/{$shipment->id}/carrier", ['carrier_id' => 9999])
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/carrier", ['carrier_id' => 9999])
             ->assertStatus(400)
             ->assertJsonPath('custom_code', 4000);
     }
 
     public function test_shipment_endpoints_require_authentication(): void
     {
-        $this->postJson('/api/v1/shipment/shipments', $this->shipmentPayload())->assertStatus(401);
-        $this->getJson('/api/v1/shipment/shipments')->assertStatus(401);
-        $this->getJson('/api/v1/shipment/shipments/1')->assertStatus(401);
+        $this->postJson('/api/shipment/v1/shipments', $this->shipmentPayload())->assertStatus(401);
+        $this->getJson('/api/shipment/v1/shipments')->assertStatus(401);
+        $this->getJson('/api/shipment/v1/shipments/1')->assertStatus(401);
     }
 }
