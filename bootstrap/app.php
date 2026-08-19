@@ -1,8 +1,11 @@
 <?php
 
 use App\Exceptions\ApiException\ApiException;
+use App\Exceptions\ApiException\ExceptionResponse;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -38,8 +41,17 @@ return Application::configure(basePath: dirname(__DIR__))
             if (method_exists($exception, 'toResponse')) {
                 return $exception->toResponse();
             }
+
+            $isApiRequest = request()->is('api/*') || request()->expectsJson();
+
+            if ($exception instanceof AuthenticationException && $isApiRequest) {
+                return response()->json(['message' => $exception->getMessage()], 401);
+            }
+            if ($exception instanceof AuthorizationException && $isApiRequest) {
+                return response()->json(['message' => $exception->getMessage()], 403);
+            }
             if (request()->headers->get('Accept') === 'application/json') {
-                return \App\Exceptions\ApiException\ExceptionResponse::instance($exception->getMessage(), 400)->toResponse();
+                return ExceptionResponse::instance($exception->getMessage(), 400)->toResponse();
             }
         });
     })->create();
