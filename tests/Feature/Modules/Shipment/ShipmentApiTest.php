@@ -110,7 +110,8 @@ class ShipmentApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('body.shipment.id', $shipment->id)
             ->assertJsonPath('body.shipment.tracking_code', $shipment->tracking_code)
-            ->assertJsonCount(0, 'body.shipment.status_histories');
+            ->assertJsonCount(0, 'body.shipment.status_histories.data')
+            ->assertJsonPath('body.shipment.status_histories.paginate.total', 0);
     }
 
     public function test_user_cannot_view_another_users_shipment(): void
@@ -129,6 +130,64 @@ class ShipmentApiTest extends TestCase
         $this->actingUser();
 
         $this->getJson('/api/shipment/v1/shipments/9999')
+            ->assertStatus(404)
+            ->assertJsonPath('custom_code', 4002);
+    }
+
+    public function test_status_histories_are_paginated_on_show(): void
+    {
+        $user = $this->actingUser();
+        $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
+        Shipment::factory()->pickedUp()->create(['customer_id' => $user->id]);
+
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'picked_up']);
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'in_transit']);
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'out_for_delivery']);
+
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}?per_page=2")
+            ->assertOk()
+            ->assertJsonCount(2, 'body.shipment.status_histories.data')
+            ->assertJsonPath('body.shipment.status_histories.paginate.total', 3)
+            ->assertJsonPath('body.shipment.status_histories.paginate.per_page', 2)
+            ->assertJsonPath('body.shipment.status_histories.data.0.status', 'out_for_delivery');
+    }
+
+    public function test_user_can_list_paginated_status_histories(): void
+    {
+        $user = $this->actingUser();
+        $shipment = Shipment::factory()->create(['customer_id' => $user->id]);
+
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'picked_up']);
+        $this->patchJson("/api/shipment/v1/shipments/{$shipment->id}/status", ['status' => 'in_transit']);
+
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}/histories")
+            ->assertOk()
+            ->assertJsonCount(2, 'body.status_histories.data')
+            ->assertJsonPath('body.status_histories.paginate.total', 2);
+
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}/histories?per_page=1")
+            ->assertOk()
+            ->assertJsonCount(1, 'body.status_histories.data')
+            ->assertJsonPath('body.status_histories.paginate.per_page', 1)
+            ->assertJsonPath('body.status_histories.paginate.has_more_pages', true)
+            ->assertJsonPath('body.status_histories.data.0.status', 'in_transit');
+    }
+
+    public function test_histories_of_another_users_shipment_return_403(): void
+    {
+        $this->actingUser();
+        $shipment = Shipment::factory()->create();
+
+        $this->getJson("/api/shipment/v1/shipments/{$shipment->id}/histories")
+            ->assertStatus(403)
+            ->assertJsonPath('custom_code', 4003);
+    }
+
+    public function test_histories_of_missing_shipment_return_404(): void
+    {
+        $this->actingUser();
+
+        $this->getJson('/api/shipment/v1/shipments/9999/histories')
             ->assertStatus(404)
             ->assertJsonPath('custom_code', 4002);
     }
@@ -271,5 +330,6 @@ class ShipmentApiTest extends TestCase
         $this->postJson('/api/shipment/v1/shipments', $this->shipmentPayload())->assertStatus(401);
         $this->getJson('/api/shipment/v1/shipments')->assertStatus(401);
         $this->getJson('/api/shipment/v1/shipments/1')->assertStatus(401);
+        $this->getJson('/api/shipment/v1/shipments/1/histories')->assertStatus(401);
     }
 }

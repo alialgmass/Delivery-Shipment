@@ -8,6 +8,7 @@ use App\Support\Traits\AuthorizesRequests;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 /**
@@ -55,5 +56,10 @@ class ApiController extends BaseController
     public static function singularLabel()
     {
         return __('app.'.Str::singular(Str::title(Str::snake(class_basename(static::class), ' '))));
+    }
+
+    protected function resolvePerPage(Request $request): int
+    {
+        return min(100, max(1, $request->integer('per_page', $this->perPage ?? 10)));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Modules\Shipment\Http\Resources;
 
+use App\Support\Api\Resources\WithPagination;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Shipment\Models\ShipmentStatusHistory;
@@ -11,6 +12,7 @@ use Modules\Shipment\Models\ShipmentStatusHistory;
  */
 class ShipmentStatusHistoryResource extends JsonResource
 {
+    use WithPagination;
     /**
      * Transform the resource into an array.
      *

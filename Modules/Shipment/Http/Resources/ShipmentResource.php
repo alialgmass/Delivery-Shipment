@@ -40,7 +40,7 @@ class ShipmentResource extends JsonResource
             'created_at' => $this->created_at?->toDateTimeString(),
             'customer' => UserResource::make($this->whenLoaded('customer')),
             'carrier' => CarrierResource::make($this->whenLoaded('carrier')),
-            'status_histories' => ShipmentStatusHistoryResource::collection($this->whenLoaded('statusHistories')),
+            'status_histories' => ShipmentStatusHistoryResource::paginate($this->whenLoaded('statusHistories')),
         ];
     }
 }
